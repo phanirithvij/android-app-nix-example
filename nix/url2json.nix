@@ -1,30 +1,37 @@
 # This script url2json.sh is the heart behind gradle dependency lock generation
 {
-  stdenv, fetchurl, writeShellApplication, coreutils, bash, gnugrep, curl, nix, jq, htmlq
+  stdenv,
+  writeShellApplication,
+  coreutils,
+  bash,
+  gnugrep,
+  curl,
+  nix,
+  jq,
+  htmlq,
 }:
 let
   url2json-uncached = stdenv.mkDerivation {
     name = "url2json-uncached";
     phases = [ "buildPhase" ];
-    src = fetchurl {
-      url = "https://github.com/status-im/status-mobile/raw/2df7a7cf6d46c8d1add73b8965ce8b04e6f7d014/nix/deps/gradle/url2json.sh";
-      hash = "sha256-McEyQPvofpMYv7mvX/7m/eRNYxJOUkm98foSYmYOyE4=";
-      executable = true;
-    };
+    src = ./url2json.sh;
     buildPhase = ''
-      mkdir -p $out/bin; cd $out/bin
-      cp $src url2json.sh
-      chmod +w url2json.sh
-      patch -p1 < ${./url2json-fix-printing.patch}
-      #sed -i 's|2>/dev/null||' url2json.sh
-      chmod -w url2json.sh
-      mv url2json.sh url2json
+      mkdir -p $out/bin
+      cp $src $out/bin/url2json
     '';
     meta.mainProgram = "url2json";
   };
   url2json-cached = writeShellApplication {
     name = "url2json";
-    runtimeInputs = [ coreutils bash gnugrep curl nix jq htmlq ];
+    runtimeInputs = [
+      coreutils
+      bash
+      gnugrep
+      curl
+      nix
+      jq
+      htmlq
+    ];
     inheritPath = false;
     text = ''
       mkdir -p .cache/url2json/
@@ -44,4 +51,4 @@ let
     '';
   };
 in
-  url2json-cached
+url2json-cached
