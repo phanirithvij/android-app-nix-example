@@ -68,8 +68,8 @@ let
       echo "[" >"$out"
 
       # note: moreutils parallel doesn't work here
-      echo -en "$deps_list" | go-maven-resolver -workers 4 -retries 10 -timeout 10 | \
-        parallel --will-cite --keep-order --jobs 4 url2json >>"$out"
+      echo -en "$deps_list" | go-maven-resolver -workers 1 -retries 10 -timeout 10 | \
+        parallel --will-cite --keep-order --jobs 1 url2json >>"$out"
 
       # convert to gradle2nix lock format
       grep . "$out" | sed '$s/,$/\n]/' | jq -r 'map(. as $root | {
