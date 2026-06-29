@@ -68,7 +68,7 @@ let
       echo "[" >"$out"
 
       # note: moreutils parallel doesn't work here
-      echo -en "$deps_list" | go-maven-resolver | \
+      echo -en "$deps_list" | go-maven-resolver -workers 4 -retries 10 -timeout 10 | \
         parallel --will-cite --keep-order --jobs 4 url2json >>"$out"
 
       # convert to gradle2nix lock format

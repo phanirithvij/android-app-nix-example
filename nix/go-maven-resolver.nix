@@ -17,6 +17,8 @@ buildGoModule (finalAttrs: {
     hash = "sha256-wYGjOcNnhMU2hwKGNLEAT4CcienKw5CvWieH1wV7bA8=";
   };
 
+  patches = [ ./0001-exponential-backoff-for-rate-limits.patch ];
+
   meta = {
     description = "go maven resolver";
     homepage = "https://github.com/status-im/go-maven-resolver";

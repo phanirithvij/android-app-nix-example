@@ -1,0 +1,89 @@
+From 662fc23b71c6eaad71abc4b8e380c286c5bcc1d9 Mon Sep 17 00:00:00 2001
+From: phanirithvij <phanirithvij2000@gmail.com>
+Date: Mon, 29 Jun 2026 18:41:55 +0530
+Subject: [PATCH] exponential backoff for rate limits
+
+Signed-off-by: phanirithvij <phanirithvij2000@gmail.com>
+---
+ fetcher/fetcher.go | 15 +++++++++++++--
+ pom/metadata.go    |  3 ++-
+ pom/project.go     |  3 ++-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/fetcher/fetcher.go b/fetcher/fetcher.go
+index 8ec56e5..9c20baa 100644
+--- a/fetcher/fetcher.go
++++ b/fetcher/fetcher.go
+@@ -68,7 +68,7 @@ func New(retries, limit, timeout int, repos []string, l *log.Logger) Fetcher {
+ }
+ 
+ func (p *Fetcher) retryFetch(url string) (io.ReadCloser, error) {
+-	var resp http.Response
++	var lastStatus int
+ 	for r := 1; r <= p.retries; r++ {
+ 		client := &http.Client{
+ 			Timeout: time.Duration(p.timeout) * time.Second,
+@@ -77,9 +77,14 @@ func (p *Fetcher) retryFetch(url string) (io.ReadCloser, error) {
+ 		if err != nil {
+ 			return nil, err
+ 		}
++
++		lastStatus = resp.StatusCode
+ 		if resp.StatusCode == http.StatusOK {
+ 			return resp.Body, nil
+ 		}
++
++		resp.Body.Close()
++
+ 		/* 404 must mean it doesn't exist. */
+ 		if resp.StatusCode == http.StatusNotFound {
+ 			break
+@@ -87,8 +92,14 @@ func (p *Fetcher) retryFetch(url string) (io.ReadCloser, error) {
+ 		/* Any other code might be a transient issue. */
+ 		p.l.Printf("warning: retrying %d/%d due to status: %d, url: %s",
+ 			r, p.retries, resp.StatusCode, url)
++
++		if resp.StatusCode == http.StatusTooManyRequests {
++			time.Sleep(time.Duration(r) * 5 * time.Second)
++		} else {
++			time.Sleep(time.Duration(r) * time.Second)
++		}
+ 	}
+-	return nil, fmt.Errorf("failed to fetch with: %d", resp.StatusCode)
++	return nil, fmt.Errorf("failed to fetch with: %d", lastStatus)
+ }
+ 
+ func (p *Fetcher) tryRepo(repo, path string) (*Result, error) {
+diff --git a/pom/metadata.go b/pom/metadata.go
+index 0d21abe..c7a7c59 100644
+--- a/pom/metadata.go
++++ b/pom/metadata.go
+@@ -2,8 +2,9 @@ package pom
+ 
+ import (
+ 	"encoding/xml"
+-	"golang.org/x/net/html/charset"
+ 	"io"
++
++	"golang.org/x/net/html/charset"
+ )
+ 
+ type Versioning struct {
+diff --git a/pom/project.go b/pom/project.go
+index 53dc8c8..ebd5afd 100644
+--- a/pom/project.go
++++ b/pom/project.go
+@@ -2,8 +2,9 @@ package pom
+ 
+ import (
+ 	"encoding/xml"
+-	"golang.org/x/net/html/charset"
+ 	"io"
++
++	"golang.org/x/net/html/charset"
+ )
+ 
+ /* Root object in XML POM files defining packages. */
+-- 
+2.54.0
+
