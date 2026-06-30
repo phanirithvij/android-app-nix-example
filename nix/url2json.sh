@@ -19,7 +19,8 @@
 
 # This defines URLs of Maven repos we know about and use.
 declare -a REPOS=(
-  "https://repo.maven.apache.org/maven2"
+  #"https://repo.maven.apache.org/maven2"
+  "https://maven-central.storage-download.googleapis.com/maven2"
   "https://dl.google.com/dl/android/maven2"
   "https://plugins.gradle.org/m2"
   "https://jitpack.io"
