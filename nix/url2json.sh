@@ -9,6 +9,14 @@
 # a local Maven repository.
 #
 
+# https://stackoverflow.com/questions/5233610/what-are-the-official-mirrors-of-the-maven-central-repository
+# https://repo.maven.apache.org/maven2/.meta/repository-metadata.xml
+# https://repo1.maven.org/maven2/.meta/repository-metadata.xml
+# https://maven-central.storage.googleapis.com/maven2/.meta/repository-metadata.xml
+# https://maven-central.storage-download.googleapis.com/maven2/.meta/repository-metadata.xml
+# https://maven-central-eu.storage-download.googleapis.com/maven2/.meta/repository-metadata.xml
+# https://maven-central-asia.storage-download.googleapis.com/maven2/.meta/repository-metadata.xml
+
 # This defines URLs of Maven repos we know about and use.
 declare -a REPOS=(
   "https://repo.maven.apache.org/maven2"
