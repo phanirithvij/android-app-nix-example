@@ -1,0 +1,32 @@
+From 2952cfb4a6f5b7cb4d13ed1f56fc035cd292f28f Mon Sep 17 00:00:00 2001
+From: phanirithvij <phanirithvij2000@gmail.com>
+Date: Tue, 30 Jun 2026 11:20:18 +0530
+Subject: [PATCH 2/2] add user-agent
+
+Signed-off-by: phanirithvij <phanirithvij2000@gmail.com>
+---
+ fetcher/fetcher.go | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/fetcher/fetcher.go b/fetcher/fetcher.go
+index 9c20baa..7ae7808 100644
+--- a/fetcher/fetcher.go
++++ b/fetcher/fetcher.go
+@@ -73,7 +73,13 @@ func (p *Fetcher) retryFetch(url string) (io.ReadCloser, error) {
+ 		client := &http.Client{
+ 			Timeout: time.Duration(p.timeout) * time.Second,
+ 		}
+-		resp, err := client.Get(url)
++		req, err := http.NewRequest("GET", url, nil)
++		if err != nil {
++			return nil, err
++		}
++		req.Header.Add("User-Agent", "go-maven-resolver/1.1.3 (contact: madlad@duck.com)")
++
++		resp, err := client.Do(req)
+ 		if err != nil {
+ 			return nil, err
+ 		}
+-- 
+2.54.0
+

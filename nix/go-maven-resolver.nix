@@ -19,7 +19,7 @@ buildGoModule (finalAttrs: {
 
   patches = [
     ./0001-exponential-backoff-for-rate-limits.patch
-    ./0002-try-google.patch
+    ./0002-add-user-agent.patch
   ];
 
   meta = {

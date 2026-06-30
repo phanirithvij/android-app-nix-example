@@ -26,6 +26,8 @@ declare -a REPOS=(
   "https://jitpack.io"
 )
 
+UA="go-maven-resolver/1.1.3 (contact: madlad@duck.com)"
+
 # These files are not necessary for the build process.
 FILENAMES_BLACKLIST='-(javadoc|runtime|gwt|headers|sources|src|tests|adapters|modular|site|bin)\.'
 FILETYPES_BLACKLIST='(pom|json|zip|xml|md5|sha1|sha256|sha512)$'
@@ -72,7 +74,7 @@ function get_pkg_files() {
     PKG_NAME="${3}"
     # Google Maven repo doesn't have normal HTML directory listing.
     if [[ "${REPO_URL}" == "https://dl.google.com/dl/android/maven2" ]]; then
-        FOUND=$(curl --fail -s "${REPO_URL}/${PKG_PATH}/artifact-metadata.json")
+        FOUND=$(curl -A "$UA" --fail -s "${REPO_URL}/${PKG_PATH}/artifact-metadata.json")
         # Some older packages do not have artifacts-metadata.json.
         if [[ "$?" -eq 0 ]]; then
             FOUND=$(echo "${FOUND}" | jq -r '.artifacts[].name')
@@ -81,7 +83,7 @@ function get_pkg_files() {
         fi
     else
         FOUND=$(
-            curl -s "${REPO_URL}/${PKG_PATH}/" \
+            curl -A "$UA" -s "${REPO_URL}/${PKG_PATH}/" \
                 | htmlq a -a href \
                 | grep -e "^${PKG_NAME}"
         )
